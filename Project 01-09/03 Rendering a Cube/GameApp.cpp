@@ -60,6 +60,8 @@ void GameApp::DrawScene()
 
     // 绘制立方体
     m_pd3dImmediateContext->DrawIndexed(36, 0, 0);
+    //m_pd3dImmediateContext->DrawIndexed(18, 0, 0);
+    //m_pd3dImmediateContext->DrawIndexed(18, 18, 0);
     HR(m_pSwapChain->Present(0, 0));
 }
 
@@ -150,9 +152,7 @@ bool GameApp::InitResource()
     // 新建索引缓冲区
     InitData.pSysMem = indices;
     HR(m_pd3dDevice->CreateBuffer(&ibd, &InitData, m_pIndexBuffer.GetAddressOf()));
-    // 输入装配阶段的索引缓冲区设置
-    m_pd3dImmediateContext->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
+    //test
 
     // ******************
     // 设置常量缓冲区描述
@@ -170,12 +170,14 @@ bool GameApp::InitResource()
     // 初始化常量缓冲区的值
     // 如果你不熟悉这些矩阵，可以先忽略，待读完第四章后再回头尝试修改
     m_CBuffer.world = XMMatrixIdentity();	// 单位矩阵的转置是它本身
-    m_CBuffer.view = XMMatrixTranspose(XMMatrixLookAtLH(
+
+    //XMMatrixLookAtLH(camera pos, focus pos, camera Up direction) 焦点设为了原点？
+    m_CBuffer.view = XMMatrixLookAtLH(
         XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f),
         XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
         XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
-    ));
-    m_CBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
+    );
+    m_CBuffer.proj = XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f);
 
 
     // ******************
@@ -185,6 +187,9 @@ bool GameApp::InitResource()
     // 输入装配阶段的顶点缓冲区设置
     UINT stride = sizeof(VertexPosColor);	// 跨越字节数
     UINT offset = 0;						// 起始偏移量
+    
+    // 输入装配阶段的索引缓冲区设置
+    m_pd3dImmediateContext->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
     m_pd3dImmediateContext->IASetVertexBuffers(0, 1, m_pVertexBuffer.GetAddressOf(), &stride, &offset);
     // 设置图元类型，设定输入布局

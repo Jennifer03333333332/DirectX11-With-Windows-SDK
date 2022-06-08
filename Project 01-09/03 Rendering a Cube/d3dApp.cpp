@@ -375,6 +375,7 @@ bool D3DApp::InitDirect3D()
     HRESULT hr = S_OK;
 
     // 创建D3D设备 和 D3D设备上下文
+
     UINT createDeviceFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)  
     createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -382,9 +383,9 @@ bool D3DApp::InitDirect3D()
     // 驱动类型数组
     D3D_DRIVER_TYPE driverTypes[] =
     {
-        D3D_DRIVER_TYPE_HARDWARE,
-        D3D_DRIVER_TYPE_WARP,
-        D3D_DRIVER_TYPE_REFERENCE,
+        D3D_DRIVER_TYPE_HARDWARE,// 硬件驱动
+        D3D_DRIVER_TYPE_WARP,// WARP驱动
+        D3D_DRIVER_TYPE_REFERENCE, // 软件驱动
     };
     UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
@@ -401,6 +402,18 @@ bool D3DApp::InitDirect3D()
     for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
     {
         d3dDriverType = driverTypes[driverTypeIndex];
+        //D3D11CreateDevice:
+        //HRESULT WINAPI D3D11CreateDevice(
+        //    IDXGIAdapter * pAdapter,             // [In_Opt]指定需要使用哪个显示卡设备,
+        //    D3D_DRIVER_TYPE DriverType,         // [In]驱动类型
+        //    HMODULE Software,                   // [In_Opt]若上面为D3D_DRIVER_TYPE_SOFTWARE则这里需要提供程序模块
+        //    UINT Flags,                         // [In]使用D3D11_CREATE_DEVICE_FLAG枚举类型
+        //    D3D_FEATURE_LEVEL * pFeatureLevels,  // [In_Opt]若为nullptr则为默认特性等级，否则需要提供特性等级数组
+        //    UINT FeatureLevels,                 // [In]特性等级数组的元素数目
+        //    UINT SDKVersion,                    // [In]SDK版本，默认D3D11_SDK_VERSION
+        //    ID3D11Device * *ppDevice,            // [Out_Opt]输出D3D设备
+        //    D3D_FEATURE_LEVEL * pFeatureLevel,   // [Out_Opt]输出当前应用D3D特性等级
+        //    ID3D11DeviceContext * *ppImmediateContext); //[Out_Opt]输出D3D设备上下文
         hr = D3D11CreateDevice(nullptr, d3dDriverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
             D3D11_SDK_VERSION, m_pd3dDevice.GetAddressOf(), &featureLevel, m_pd3dImmediateContext.GetAddressOf());
 
@@ -428,13 +441,13 @@ bool D3DApp::InitDirect3D()
         return false;
     }
 
-    // 检测 MSAA支持的质量等级
+    // 检测 MSAA支持的质量等级. DX11 都支持4X MSAA
     m_pd3dDevice->CheckMultisampleQualityLevels(
         DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_4xMsaaQuality);
     assert(m_4xMsaaQuality > 0);
 
 
-
+    //swap chain 交换链
 
     ComPtr<IDXGIDevice> dxgiDevice = nullptr;
     ComPtr<IDXGIAdapter> dxgiAdapter = nullptr;
