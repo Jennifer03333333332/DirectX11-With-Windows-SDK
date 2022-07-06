@@ -63,7 +63,7 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
     spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
     // 光向量与照射方向相反
-    float3 lightVec = -L.Direction;
+    float3 lightVec = -L.Direction; //lightVec为入射光向量，只是把起点调整为入射点
 
     // 添加环境光
     ambient = mat.Ambient * L.Ambient;

@@ -173,12 +173,14 @@ bool GameApp::InitResource()
 
     //XMMatrixLookAtLH(camera pos, focus pos, camera Up direction) 焦点设为了原点？
     m_CBuffer.view = XMMatrixLookAtLH(
-        XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f),
+        XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f),//(0.0f, 0.0f, -5.0f, 0.0f)
         XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
         XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
     );
+    //XMMatrixPerspectiveFovLH 应该包括透视投影和viewport
+    //正方形会随着窗口的变化而改变比例是正常情况
     m_CBuffer.proj = XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f);
-
+    //m_ClientHeight/2.0
 
     // ******************
     // 给渲染管线各个阶段绑定好所需资源
