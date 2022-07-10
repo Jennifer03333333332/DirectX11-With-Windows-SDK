@@ -158,7 +158,8 @@ void GameApp::DrawScene()
     if (m_pd2dRenderTarget != nullptr)
     {
         m_pd2dRenderTarget->BeginDraw();
-        static const WCHAR* textStr = L"切换显示: 1-木箱(3D) 2-火焰(2D)\n";
+        static const WCHAR* textStr = L"切换显示: 1-木箱(3D) 2-火焰(2D)\n" ;
+        //wcscat(textStr, debug_text);
         m_pd2dRenderTarget->DrawTextW(textStr, (UINT)wcslen(textStr), m_pTextFormat.Get(),
             D2D1_RECT_F{ 0.0f, 0.0f, 600.0f, 200.0f }, m_pColorBrush.Get());
         HR(m_pd2dRenderTarget->EndDraw());
@@ -223,12 +224,30 @@ bool GameApp::InitResource()
 
     // 初始化木箱纹理
     HR(CreateDDSTextureFromFile(m_pd3dDevice.Get(), L"..\\Texture\\WoodCrate.dds", nullptr, m_pWoodCrate.GetAddressOf()));
+    // 练习题9-2
+    WCHAR stringFile[6];//stringFile 纹理路径 的长度
+    m_jennifer2tsets.resize(6);
+    for (int i = 1; i <= 6; ++i)
+    {
+        if (i < 4) {
+            wsprintf(stringFile, L"..\\Texture\\jennifer%02d.dds", i);//占位符%d, 02表示size
+        }
+        else {
+            wsprintf(stringFile, L"..\\Texture\\jennifer%02d.dds", i - 3);
+        }
+        //wsprintf(debug_text, stringFile);
+        
+        HR(CreateDDSTextureFromFile(m_pd3dDevice.Get(), stringFile, nullptr, m_jennifer2tsets[static_cast<size_t>(i) - 1].GetAddressOf()));
+    }
+    //wsprintf(debug_text, L"test");
+    //debug_text =;//stringFile;
+    //OutputDebugStringW(stringFile);
     // 初始化火焰纹理
     WCHAR strFile[40];
     m_pFireAnims.resize(120);
     for (int i = 1; i <= 120; ++i)
     {
-        wsprintf(strFile, L"..\\Texture\\FireAnim\\Fire%03d.bmp", i);
+        wsprintf(strFile, L"..\\Texture\\FireAnim\\Fire%03d.bmp", i);//占位符%03d
         HR(CreateWICTextureFromFile(m_pd3dDevice.Get(), strFile, nullptr, m_pFireAnims[static_cast<size_t>(i) - 1].GetAddressOf()));
     }
         
@@ -296,7 +315,15 @@ bool GameApp::InitResource()
     m_pd3dImmediateContext->PSSetConstantBuffers(1, 1, m_pConstantBuffers[1].GetAddressOf());
     // 像素着色阶段设置好采样器
     m_pd3dImmediateContext->PSSetSamplers(0, 1, m_pSamplerState.GetAddressOf());
+    
     m_pd3dImmediateContext->PSSetShaderResources(0, 1, m_pWoodCrate.GetAddressOf());
+    //9-2 所以不
+    for (int i = 0; i < 6; ++i) {
+        m_pd3dImmediateContext->PSSetShaderResources(i+1, 1, m_jennifer2tsets[i].GetAddressOf());
+    }
+    
+    //m_jennifer2tsets[0].GetAddressOf()
+    
     m_pd3dImmediateContext->PSSetShader(m_pPixelShader3D.Get(), nullptr, 0);
     
     // ******************

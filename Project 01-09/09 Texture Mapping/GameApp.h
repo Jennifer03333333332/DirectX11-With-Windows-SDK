@@ -55,6 +55,8 @@ private:
     ComPtr<IDWriteFont> m_pFont;								// 字体
     ComPtr<IDWriteTextFormat> m_pTextFormat;					// 文本格式
 
+    //WCHAR* debug_text;                   //Debug打印位
+
     ComPtr<ID3D11InputLayout> m_pVertexLayout2D;				// 用于2D的顶点输入布局
     ComPtr<ID3D11InputLayout> m_pVertexLayout3D;				// 用于3D的顶点输入布局
     ComPtr<ID3D11Buffer> m_pVertexBuffer;						// 顶点缓冲区
@@ -65,6 +67,9 @@ private:
     ShowMode m_CurrMode;										// 当前显示的模式
 
     ComPtr<ID3D11ShaderResourceView> m_pWoodCrate;			    // 木盒纹理
+
+    std::vector<ComPtr<ID3D11ShaderResourceView>> m_jennifer2tsets;//test 练习题9-2
+
     std::vector<ComPtr<ID3D11ShaderResourceView>> m_pFireAnims; // 火焰纹理集
     ComPtr<ID3D11SamplerState> m_pSamplerState;				    // 采样器状态
 
