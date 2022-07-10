@@ -116,10 +116,17 @@ void GameApp::UpdateScene(float dt)
     {
         static float phi = 0.0f, theta = 0.0f;
         phi += 0.0001f, theta += 0.00015f;
+        //绕x轴转phi,绕y轴转theta
         XMMATRIX W = XMMatrixRotationX(phi) * XMMatrixRotationY(theta);
+        //由于DX是row major. 矩阵在c++这边Transpose好，在hlsl那里右乘
         m_VSConstantBuffer.world = XMMatrixTranspose(W);
         m_VSConstantBuffer.worldInvTranspose = XMMatrixTranspose(InverseTranspose(W));
-
+        //9-3 旋转中心为0.5,0.5
+        static float r = 0.0f; r += dt;
+        //RotationX类似y轴平移，RotationY类似x轴平移，不是很懂为什么。RotationZ比较像样
+        XMMATRIX M = XMMatrixRotationZ(r);
+            //XMMatrixTranslation(0.5f, 0.5f, 0.0f)*XMMatrixRotationZ(r)*XMMatrixTranslation(-0.5f,-0.5f,0.0f);
+        m_VSConstantBuffer.RotationMat = XMMatrixTranspose(M);
         // 更新常量缓冲区，让立方体转起来
         D3D11_MAPPED_SUBRESOURCE mappedData;
         HR(m_pd3dImmediateContext->Map(m_pConstantBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
@@ -225,7 +232,7 @@ bool GameApp::InitResource()
     // 初始化木箱纹理
     HR(CreateDDSTextureFromFile(m_pd3dDevice.Get(), L"..\\Texture\\WoodCrate.dds", nullptr, m_pWoodCrate.GetAddressOf()));
     // 练习题9-2
-    WCHAR stringFile[6];//stringFile 纹理路径 的长度
+    WCHAR stringFile[30];//stringFile 纹理路径 的长度
     m_jennifer2tsets.resize(6);
     for (int i = 1; i <= 6; ++i)
     {
@@ -277,7 +284,8 @@ bool GameApp::InitResource()
     ));
     m_VSConstantBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
     m_VSConstantBuffer.worldInvTranspose = XMMatrixIdentity();
-    
+    m_VSConstantBuffer.RotationMat = XMMatrixIdentity();//9-3
+
     // 初始化用于PS的常量缓冲区的值
     // 这里只使用一盏点光来演示
     m_PSConstantBuffer.pointLight[0].position = XMFLOAT3(0.0f, 0.0f, -10.0f);
@@ -319,7 +327,7 @@ bool GameApp::InitResource()
     m_pd3dImmediateContext->PSSetShaderResources(0, 1, m_pWoodCrate.GetAddressOf());
     //9-2 所以不
     for (int i = 0; i < 6; ++i) {
-        m_pd3dImmediateContext->PSSetShaderResources(i+1, 1, m_jennifer2tsets[i].GetAddressOf());
+        m_pd3dImmediateContext->PSSetShaderResources(i+1, 1, m_jennifer2tsets[static_cast<size_t>(i)].GetAddressOf());
     }
     
     //m_jennifer2tsets[0].GetAddressOf()

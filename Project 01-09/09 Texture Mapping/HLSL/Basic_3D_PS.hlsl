@@ -42,15 +42,17 @@ float4 PS(VertexPosHWNormalTex pIn) : SV_Target
         spec += S;
     }
     
-    float4 texColor = g_Tex.Sample(g_SamLinear, pIn.Tex);
+    //float4 texColor = g_Tex.Sample(g_SamLinear, pIn.Tex);
     
     //换成每个面 使用不同的纹理 j_TexArray
     //Texture array的sample方法，第二个参数为float3，由纹理坐标和数组index组成 起始为0
     
     //float4 texColor = j_TexArray.Sample(g_SamLinear, float3(pIn.Tex, 8));
-    //float4 texColor = j_Tex3.Sample(g_SamLinear, pIn.Tex);
+    //blend
+    float4 texColor = j_Tex1.Sample(g_SamLinear, pIn.Tex) * j_Tex2.Sample(g_SamLinear, pIn.Tex);
+    //float4 texColor = j_Tex1.Sample(g_SamLinear, pIn.Tex);
     
-    
+    //9-3 如何对纹理坐标*旋转矩阵
     
     float4 litColor = texColor * (ambient + diffuse) + spec;
     litColor.a = texColor.a * g_Material.Diffuse.a;

@@ -17,6 +17,7 @@ cbuffer VSConstantBuffer : register(b0)
     matrix g_View;  
     matrix g_Proj;  
     matrix g_WorldInvTranspose;
+    matrix g_RotationMat;
 }
 
 cbuffer PSConstantBuffer : register(b1)
